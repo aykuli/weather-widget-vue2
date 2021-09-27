@@ -1,7 +1,7 @@
 export interface WeatherData {
   city?: string
-  temperature: string
-  feelsLike: string
+  temperature: number
+  feelsLike: number
   humidity: number
   windSpeed: number
   pressure: number

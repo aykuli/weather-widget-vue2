@@ -140,7 +140,6 @@ export default class Form extends Vue {
   }
 
   saveLocation(): void {
-    // const newHistory = [...this.history, this.city]
     this.history = [...this.history, this.city]
     this.city = ''
     localStorage.setItem(WEATHER_WIDGET_DATA_HISTORY, JSON.stringify(this.history))

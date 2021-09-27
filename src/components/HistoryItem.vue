@@ -12,12 +12,8 @@
 import { Vue, Prop, Component } from 'vue-property-decorator'
 
 @Component
-export default class App extends Vue {
+export default class HistoryItem extends Vue {
   @Prop(String)
   public city!: string
-
-  mounted(): void {
-    console.log('1')
-  }
 }
 </script>

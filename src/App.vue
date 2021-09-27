@@ -19,8 +19,29 @@
         ></el-button>
       </div>
       <div v-if="weatherData" class="weather__wrap">
-        <img :src="weatherData.icon" />
-        <p>{{ weatherData.temperature || '' }}</p>
+        <div class="weather__current--wrap">
+          <div class="weather__current">
+            <weather-icon :iconName="weatherData.icon || ''" />
+
+            <div>
+              <span>{{ Math.round(weatherData.temperature, 0) || '' }}</span>
+              <span class="weather__current--sign">°</span>
+            </div>
+          </div>
+          <div class="weather__current--list">
+            <p class="weather__current--item">
+              <span>Feels like: </span><span>{{ weatherData.feels_like }}</span
+              ><span>°</span>
+            </p>
+            <p class="weather__current--item">
+              <span>Wind: </span><span>{{ weatherData.windSpeed }}</span
+              ><span> m/s</span>
+            </p>
+            <p class="weather__current--item">
+              <span>Humidity: </span><span>{{ weatherData.humidity }}%</span>
+            </p>
+          </div>
+        </div>
       </div>
     </el-card>
     <form-modal :isShow="isShow" :closeConfig="closeConfig"></form-modal>
@@ -49,20 +70,49 @@
 }
 .title {
   margin: 0;
-  font-weight: 600;
   font-size: 1.5rem;
+  font-weight: 600;
+}
+.weather__current--wrap {
+  margin-bottom: 30px;
+}
+.weather__current {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 380px;
+  font-size: 200px;
+  line-height: 250px;
+  font-weight: 700;
+}
+.weather__current--list {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 220px;
+  margin-bottom: 30px;
+  font-size: 20px;
+  line-height: 22px;
+}
+.weather__current--item {
+  margin-bottom: 5px;
 }
 </style>
 
 <script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
 import { WeatherData, WidgetGeoLocation, WidgetConfig } from './types'
 import { WEATHER_WIDGET_DATA } from './constantas'
 import FormModal from './components/Form.vue'
-import { Vue, Component } from 'vue-property-decorator'
+import WeatherIcon from './components/WeatherIcon.vue'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mock = require('./mock.json')
 
 @Component({
   components: {
     FormModal,
+    WeatherIcon,
   },
 })
 export default class App extends Vue {
@@ -70,6 +120,7 @@ export default class App extends Vue {
   weatherData: null | WeatherData = null
   location: WidgetGeoLocation | null = null
   isShow = false
+  icon: any = null
 
   async mounted(): Promise<void> {
     const isGetCurrPlace = !this.isConfigFromLocalStorageExists()
@@ -124,58 +175,53 @@ export default class App extends Vue {
   }
 
   private async getWeatherData(q: string) {
-    try {
-      this.isLoading = true
+    const data = mock
 
-      const res = await fetch(
-        `https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?${q}&appid=${process.env.VUE_APP_API_KEY}&units=metric`,
-        {
-          method: 'GET',
-          mode: 'cors',
-          credentials: 'same-origin',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Credentials': 'true',
-            'Access-Control-Allow-Headers': '*',
-            'Content-Type': 'json',
-            'X-Requested-With': 'WebView',
-          },
-          referrerPolicy: 'no-referrer',
-        }
-      )
-      console.log('res: ', res)
-      const data = await res.json()
-      const icon = data.weather?.length ? data.weather[0].icon : undefined
-      if (icon) {
-        this.getIcon(icon)
-      }
-      this.weatherData = {
-        city: data.name || '',
-        temperature: data.main.temp,
-        feelsLike: data.main.feels_like,
-        humidity: data.main.humidity,
-        windSpeed: data.wind.speed,
-        pressure: 12,
-      }
-    } catch (e) {
-      console.error(e)
-    } finally {
-      this.isLoading = false
+    this.weatherData = {
+      city: data.name || '',
+      temperature: data.main.temp,
+      feelsLike: data.main.feels_like,
+      humidity: data.main.humidity,
+      windSpeed: data.wind.speed,
+      pressure: 12,
+      icon: data.weather?.length ? data.weather[0].icon : undefined,
     }
-  }
 
-  async getIcon(icon: string): Promise<void> {
-    console.log(icon)
-    try {
-      const res = await fetch(` http://openweathermap.org/img/wn/${icon || '01d'}@2x.png`, {})
-      const imageObjectURL = URL.createObjectURL(await res.blob())
-      if (this.weatherData) {
-        this.weatherData.icon = imageObjectURL
-        console.log(imageObjectURL)
-      }
-    } catch (e) {
-      console.error(e)
-    }
+    // try {
+    //   this.isLoading = true
+
+    //   const res = await fetch(
+    //     `https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?${q}&appid=${process.env.VUE_APP_API_KEY}&units=metric`,
+    //     {
+    //       method: 'GET',
+    //       mode: 'cors',
+    //       credentials: 'same-origin',
+    //       headers: {
+    //         'Access-Control-Allow-Origin': '*',
+    //         'Access-Control-Allow-Credentials': 'true',
+    //         'Access-Control-Allow-Headers': '*',
+    //         'Content-Type': 'json',
+    //         'X-Requested-With': 'WebView',
+    //       },
+    //       referrerPolicy: 'no-referrer',
+    //     }
+    //   )
+    //   console.log('res: ', res)
+    //   const data = await res.json()
+    //   this.weatherData = {
+    //     city: data.name || '',
+    //     temperature: data.main.temp,
+    //     feelsLike: data.main.feels_like,
+    //     humidity: data.main.humidity,
+    //     windSpeed: data.wind.speed,
+    //     pressure: 12,
+    //     icon: data.weather?.length ? data.weather[0].icon : undefined,
+    //   }
+    // } catch (e) {
+    //   console.error(e)
+    // } finally {
+    //   this.isLoading = false
+    // }
   }
 
   openConfig(): void {
