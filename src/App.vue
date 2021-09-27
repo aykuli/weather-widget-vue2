@@ -1,9 +1,9 @@
 <template>
   <div class="container">
     <el-card shadow="always" class="box-card">
-      <div slot="header" class="clearfix">
-        <p v-if="weatherData">{{ weatherData.city || '' }}</p>
-        <el-button style="float: right; padding: 3px 0" type="text" class="config" @click="openConfig">
+      <div slot="header" class="clearfix header">
+        <p class="title" v-if="weatherData">{{ weatherData.city || '' }}</p>
+        <el-button @click="openConfig" type="primary" plain size="small">
           <svg
             width="20"
             height="20"
@@ -19,6 +19,7 @@
         ></el-button>
       </div>
       <div v-if="weatherData" class="weather__wrap">
+        <img :src="weatherData.icon" />
         <p>{{ weatherData.temperature || '' }}</p>
       </div>
     </el-card>
@@ -36,10 +37,20 @@
 .header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  & button {
+    display: flex;
+    justify-content: center;
+    width: 20px;
+    padding: 3px 13px 2px;
+    text-align: center;
+    border-radius: 50%;
+  }
 }
-.config {
-  width: 20px;
-  border-radius: 50%;
+.title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.5rem;
 }
 </style>
 
@@ -117,7 +128,7 @@ export default class App extends Vue {
       this.isLoading = true
 
       const res = await fetch(
-        `https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?${q}&appid=${process.env.VUE_APP_API_KEY}`,
+        `https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?${q}&appid=${process.env.VUE_APP_API_KEY}&units=metric`,
         {
           method: 'GET',
           mode: 'cors',
@@ -134,7 +145,10 @@ export default class App extends Vue {
       )
       console.log('res: ', res)
       const data = await res.json()
-      console.log('data: ', data)
+      const icon = data.weather?.length ? data.weather[0].icon : undefined
+      if (icon) {
+        this.getIcon(icon)
+      }
       this.weatherData = {
         city: data.name || '',
         temperature: data.main.temp,
@@ -147,6 +161,20 @@ export default class App extends Vue {
       console.error(e)
     } finally {
       this.isLoading = false
+    }
+  }
+
+  async getIcon(icon: string): Promise<void> {
+    console.log(icon)
+    try {
+      const res = await fetch(` http://openweathermap.org/img/wn/${icon || '01d'}@2x.png`, {})
+      const imageObjectURL = URL.createObjectURL(await res.blob())
+      if (this.weatherData) {
+        this.weatherData.icon = imageObjectURL
+        console.log(imageObjectURL)
+      }
+    } catch (e) {
+      console.error(e)
     }
   }
 

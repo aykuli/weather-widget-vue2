@@ -5,6 +5,7 @@ export interface WeatherData {
   humidity: number
   windSpeed: number
   pressure: number
+  icon?: string
 }
 
 export interface WidgetGeoLocation {
