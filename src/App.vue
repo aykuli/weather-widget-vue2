@@ -3,45 +3,52 @@
     <el-card shadow="always" class="box-card">
       <div slot="header" class="clearfix header">
         <p class="title" v-if="weatherData">{{ weatherData.city || '' }}</p>
-        <el-button @click="openConfig" type="primary" plain size="small">
-          <svg
-            width="20"
-            height="20"
-            xmlns="http://www.w3.org/2000/svg"
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            viewBox="0 0 24 24"
-          >
-            <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="1"></circle>
-              <circle cx="12" cy="19" r="1"></circle>
-              <circle cx="12" cy="5" r="1"></circle>
-            </g></svg
-        ></el-button>
+        <el-button type="primary" circle icon="el-icon-s-tools" @click="openConfig"></el-button>
       </div>
       <div v-if="weatherData" class="weather__wrap">
-        <div class="weather__current--wrap">
-          <div class="weather__current">
-            <weather-icon :iconName="weatherData.icon || ''" />
-
-            <div>
-              <span>{{ Math.round(weatherData.temperature, 0) || '' }}</span>
-              <span class="weather__current--sign">°</span>
-            </div>
-          </div>
-          <div class="weather__current--list">
-            <p class="weather__current--item">
-              <span>Feels like: </span><span>{{ weatherData.feels_like }}</span
-              ><span>°</span>
-            </p>
-            <p class="weather__current--item">
-              <span>Wind: </span><span>{{ weatherData.windSpeed }}</span
-              ><span> m/s</span>
-            </p>
-            <p class="weather__current--item">
-              <span>Humidity: </span><span>{{ weatherData.humidity }}%</span>
-            </p>
+        <div class="weather__current">
+          <weather-icon :iconName="weatherData.icon || ''" class="weather__icon" />
+          <div>
+            <span>{{ Math.round(weatherData.temperature, 0) || '' }}</span>
+            <span class="weather__current--sign">°</span>
           </div>
         </div>
+        <el-descriptions class="margin-top" :column="1" size="default" border>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-user"></i>
+              Feels like
+            </template>
+            <span class="value">
+              {{ weatherData.feelsLike }}
+            </span>
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-s-unfold"></i>
+              Wind
+            </template>
+            <span class="value">
+              {{ weatherData.windSpeed }}
+            </span>
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-magic-stick"></i>
+              Humidity
+            </template>
+            <span class="value"> {{ weatherData.humidity }} % </span>
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-attract"></i>
+              Pressure
+            </template>
+            <span class="value">
+              {{ weatherData.pressure }}
+            </span>
+          </el-descriptions-item>
+        </el-descriptions>
       </div>
     </el-card>
     <form-modal :isShow="isShow" :closeConfig="closeConfig"></form-modal>
@@ -60,50 +67,53 @@
   justify-content: space-between;
   align-items: center;
   & button {
-    display: flex;
-    justify-content: center;
-    width: 20px;
-    padding: 3px 13px 2px;
-    text-align: center;
-    border-radius: 50%;
+    padding: 5px;
   }
+}
+.value {
+  font-size: 1rem;
+  font-weight: 600;
 }
 .title {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
 }
-.weather__current--wrap {
-  margin-bottom: 30px;
-}
-.weather__current {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  width: 380px;
-  font-size: 200px;
-  line-height: 250px;
-  font-weight: 700;
-}
-.weather__current--list {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  width: 220px;
-  margin-bottom: 30px;
-  font-size: 20px;
-  line-height: 22px;
-}
-.weather__current--item {
-  margin-bottom: 5px;
+.weather {
+  &__icon {
+    margin-right: 20px;
+  }
+  &__current {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    font-size: 6rem;
+    line-height: 6.2rem;
+    font-weight: 700;
+    &--sign {
+      font-size: 4rem;
+    }
+    &--list {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      width: 220px;
+      margin-bottom: 30px;
+      font-size: 20px;
+      line-height: 22px;
+    }
+    &--item {
+      margin-bottom: 5px;
+    }
+  }
 }
 </style>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { WeatherData, WidgetGeoLocation, WidgetConfig } from './types'
-import { WEATHER_WIDGET_DATA } from './constantas'
+import { WeatherData, WidgetGeoLocation } from './types'
+import { WEATHER_WIDGET_DATA_HISTORY } from './constantas'
 import FormModal from './components/Form.vue'
 import WeatherIcon from './components/WeatherIcon.vue'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -130,15 +140,17 @@ export default class App extends Vue {
   }
 
   isConfigFromLocalStorageExists(): boolean {
-    const location = localStorage.getItem(WEATHER_WIDGET_DATA)
+    const location = localStorage.getItem(WEATHER_WIDGET_DATA_HISTORY)
     if (location) {
       try {
-        const { city, latitude, longitude }: WidgetConfig = JSON.parse(location)
+        const { city, latitude, longitude, countryCode }: WidgetGeoLocation = JSON.parse(location)
         this.location = {
           city: city || 'Moscow',
           latitude,
           longitude,
+          countryCode,
         }
+        console.log(this.location)
         return true
       } catch (e) {
         return false
@@ -150,9 +162,7 @@ export default class App extends Vue {
   async getCurrentPlace(): Promise<void> {
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
-        console.log('0', latitude, longitude)
         this.location = { latitude, longitude }
-        console.log('this.location: ', this.location)
         this.getQuery()
       },
       (error) => {
@@ -163,29 +173,31 @@ export default class App extends Vue {
   }
 
   private getQuery(): void {
-    console.log('this.location: ', this.location)
     if (this.location?.city) {
       const stateCode = this.location?.stateCode ? `,${this.location.stateCode}` : ''
       const countryCode = this.location?.countryCode ? `,${this.location.countryCode}` : ''
       const query = this.location.city + stateCode + countryCode
       this.getWeatherData(`q=${query}`)
-    } else if (this.location?.latitude && this.location.longitude) {
+    } else if (this.location?.latitude && this.location?.longitude) {
       this.getWeatherData(`lat=${this.location.latitude}&lon=${this.location.longitude}`)
     }
   }
 
   private async getWeatherData(q: string) {
     const data = mock
+    const { temp, feels_like, humidity, pressure } = data.main
+    const { speed } = data.wind
 
     this.weatherData = {
       city: data.name || '',
-      temperature: data.main.temp,
-      feelsLike: data.main.feels_like,
-      humidity: data.main.humidity,
-      windSpeed: data.wind.speed,
-      pressure: 12,
+      temperature: temp,
+      feelsLike: feels_like,
+      humidity,
+      windSpeed: speed,
+      pressure,
       icon: data.weather?.length ? data.weather[0].icon : undefined,
     }
+    console.log('this.weatherData: ', this.weatherData)
 
     // try {
     //   this.isLoading = true

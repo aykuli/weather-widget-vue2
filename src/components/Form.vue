@@ -118,7 +118,6 @@ export default class Form extends Vue {
   city = ''
 
   mounted(): void {
-    console.log('0')
     this.isConfigFromLocalStorageExists()
   }
 

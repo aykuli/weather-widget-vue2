@@ -15,9 +15,3 @@ export interface WidgetGeoLocation {
   latitude?: number
   longitude?: number
 }
-
-export interface WidgetConfig {
-  city?: string
-  latitude?: number
-  longitude?: number
-}
