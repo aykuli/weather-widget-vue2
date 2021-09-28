@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="weatherData">
     <div class="weather__current">
       <weather-icon :iconName="weatherData.icon || ''" class="weather__icon" />
       <div>
@@ -71,11 +71,13 @@
 </style>
 
 <script lang="ts">
-import { Vue, Prop, Component } from 'vue-property-decorator'
+import { Vue, Component } from 'vue-property-decorator'
+const DescriptionProps = Vue.extend({
+  props: {
+    weatherData: Object,
+  },
+})
 
 @Component
-export default class Description extends Vue {
-  @Prop(String)
-  public weatherData!: string
-}
+export default class Description extends DescriptionProps {}
 </script>

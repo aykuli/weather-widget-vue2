@@ -111,63 +111,73 @@ export default class App extends Vue {
   }
 
   private async getWeatherData(q: string) {
-    const data = mock
-    const { temp, feels_like, humidity, pressure } = data.main
-    const { speed } = data.wind
+    // const data = mock
+    // const { temp, feels_like, humidity, pressure } = data.main
+    // const { speed } = data.wind
 
-    this.weatherData = {
-      city: data.name || '',
-      temperature: temp,
-      feelsLike: feels_like,
-      humidity,
-      windSpeed: speed,
-      pressure,
-      icon: data.weather?.length ? data.weather[0].icon : undefined,
-    }
-    console.log('this.weatherData: ', this.weatherData)
-
-    // try {
-    //   this.isLoading = true
-
-    //   const res = await fetch(
-    //     `https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?${q}&appid=${process.env.VUE_APP_API_KEY}&units=metric`,
-    //     {
-    //       method: 'GET',
-    //       mode: 'cors',
-    //       credentials: 'same-origin',
-    //       headers: {
-    //         'Access-Control-Allow-Origin': '*',
-    //         'Access-Control-Allow-Credentials': 'true',
-    //         'Access-Control-Allow-Headers': '*',
-    //         'Content-Type': 'json',
-    //         'X-Requested-With': 'WebView',
-    //       },
-    //       referrerPolicy: 'no-referrer',
-    //     }
-    //   )
-    //   console.log('res: ', res)
-    //   const data = await res.json()
-    //   this.weatherData = {
-    //     city: data.name || '',
-    //     temperature: data.main.temp,
-    //     feelsLike: data.main.feels_like,
-    //     humidity: data.main.humidity,
-    //     windSpeed: data.wind.speed,
-    //     pressure: 12,
-    //     icon: data.weather?.length ? data.weather[0].icon : undefined,
-    //   }
-    // } catch (e) {
-    //   console.error(e)
-    // } finally {
-    //   this.isLoading = false
+    // this.weatherData = {
+    //   city: data.name || '',
+    //   temperature: temp,
+    //   feelsLike: feels_like,
+    //   humidity,
+    //   windSpeed: speed,
+    //   pressure,
+    //   icon: data.weather?.length ? data.weather[0].icon : undefined,
     // }
+    // console.log('this.weatherData: ', this.weatherData)
+
+    try {
+      this.isLoading = true
+
+      const res = await fetch(
+        `https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?${q}&appid=${process.env.VUE_APP_API_KEY}&units=metric`,
+        {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'same-origin',
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': 'true',
+            'Access-Control-Allow-Headers': '*',
+            'Content-Type': 'json',
+            'X-Requested-With': 'WebView',
+          },
+          referrerPolicy: 'no-referrer',
+        }
+      )
+      console.log('res: ', res)
+      const data = await res.json()
+      this.weatherData = {
+        city: data.name || '',
+        temperature: data.main.temp,
+        feelsLike: data.main.feels_like,
+        humidity: data.main.humidity,
+        windSpeed: data.wind.speed,
+        pressure: 12,
+        icon: data.weather?.length ? data.weather[0].icon : undefined,
+      }
+    } catch (e) {
+      console.error(e)
+      // if err ---> get current place
+    } finally {
+      this.isLoading = false
+    }
   }
 
   openConfig(): void {
     this.isShow = true
   }
-  closeForm(): void {
+  closeForm(option?: 'get-data'): void {
     this.isShow = false
+    if (option === 'get-data') {
+      console.log('this.location: ', this.location)
+      console.log('todo get data')
+      const locations = JSON.parse(localStorage.getItem(WEATHER_WIDGET_DATA_HISTORY) || '')
+      const location = locations[locations.length - 1]
+      const { city, country } = location
+      console.log('location: ', location)
+      this.getWeatherData(`q=${city}${country ? `,${country}` : ''}`)
+    }
   }
 
   getNewWeatherData(): void {

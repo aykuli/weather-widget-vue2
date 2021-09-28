@@ -1,10 +1,10 @@
 <template>
   <div>
-    <!-- <draggable :list="history">
-            <div v-for="element in history" :key="element">
-              {{ element }}
-            </div>
-          </draggable> -->
+    <draggable :list="history">
+      <div v-for="element in history" :key="element.city">
+        {{ element.city }}
+      </div>
+    </draggable>
     <form @submit="saveLocation">
       <el-descriptions title="Type new city to search" direction="vertical" :column="2" border>
         <el-descriptions-item label="City">
@@ -34,7 +34,7 @@
       </el-descriptions>
       <div class="footer">
         <el-button @click="closeForm">Cancel</el-button>
-        <el-button type="primary" @click="() => closeForm('get-data')" icon="el-icon-sunrise">Submit</el-button>
+        <el-button type="primary" @click="saveLocation" icon="el-icon-sunrise">Submit</el-button>
       </div>
     </form>
   </div>
@@ -71,7 +71,7 @@ import { WidgetGeoLocation } from '@/types'
 })
 export default class Form extends Vue {
   isShow!: string
-  closeForm!: () => void
+  closeForm!: (option?: 'get-data') => void
 
   history: WidgetGeoLocation[] = []
   city = ''
@@ -111,7 +111,9 @@ export default class Form extends Vue {
   saveLocation(): void {
     this.history = [...this.history, { city: this.city, country: this.country } as WidgetGeoLocation]
     localStorage.setItem(WEATHER_WIDGET_DATA_HISTORY, JSON.stringify(this.history))
-    this.closeForm()
+    this.city = ''
+    this.country = ''
+    this.closeForm('get-data')
   }
 }
 </script>
