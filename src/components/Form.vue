@@ -1,8 +1,8 @@
 <template>
   <div>
     <draggable :list="history">
-      <div v-for="element in history" :key="element.city">
-        {{ element.city }}
+      <div v-for="(place, index) in history" :key="index">
+        <history-item :deleteItem="() => deletePlace(index)" :place="place"></history-item>
       </div>
     </draggable>
     <form @submit="saveLocation">
@@ -114,6 +114,14 @@ export default class Form extends Vue {
     this.city = ''
     this.country = ''
     this.closeForm('get-data')
+  }
+  deletePlace(index: number): void {
+    console.log(index)
+    console.log('this.history: ', this.history)
+    const newHistory = [...this.history.slice(0, index), ...this.history.slice(index + 1)]
+    console.log('this.newHistory: ', newHistory)
+    localStorage.setItem(WEATHER_WIDGET_DATA_HISTORY, JSON.stringify(newHistory))
+    this.history = newHistory
   }
 }
 </script>

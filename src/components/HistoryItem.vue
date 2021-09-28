@@ -1,19 +1,21 @@
 <template>
   <div>
-    <p>
-      {{ city }}
-    </p>
+    <span> {{ place.city }}, {{ place.country }} </span>
+    <el-button circle icon="el-icon-delete" type="danger" @click="() => deleteItem(index)"></el-button>
   </div>
 </template>
 
 <style scoped></style>
 
 <script lang="ts">
-import { Vue, Prop, Component } from 'vue-property-decorator'
+import { Vue, Component } from 'vue-property-decorator'
 
-@Component
-export default class HistoryItem extends Vue {
-  @Prop(String)
-  public city!: string
-}
+@Component({
+  props: {
+    index: Number,
+    place: Object,
+    deleteItem: Function,
+  },
+})
+export default class HistoryItem extends Vue {}
 </script>

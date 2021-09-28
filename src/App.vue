@@ -7,8 +7,11 @@
       </div>
       <description :weatherData="weatherData" />
     </el-card>
-    <el-dialog title="Settings" :visible.sync="isShow" width="30%" :before-close="closeForm">
-      <form-modal :isShow="isShow" :closeForm="closeForm"></form-modal>
+    <el-dialog title="Settings" :visible.sync="isShowForm" width="30%" :before-close="closeForm">
+      <form-modal :isShow="isShowForm" :closeForm="closeForm"></form-modal>
+    </el-dialog>
+    <el-dialog title="Error" :visible.sync="isShowErrModal" width="30%" :before-close="closeErrModal">
+      <error-modal :closeErrModal="closeErrModal" :errMsg="errMsg"></error-modal>
     </el-dialog>
   </div>
 </template>
@@ -56,7 +59,9 @@ export default class App extends Vue {
   isLoading = false
   weatherData: null | WeatherData = null
   location: WidgetGeoLocation | null = null
-  isShow = false
+  isShowForm = false
+  isShowErrModal = false
+  errMsg = ''
   icon: any = null
 
   async mounted(): Promise<void> {
@@ -111,64 +116,73 @@ export default class App extends Vue {
   }
 
   private async getWeatherData(q: string) {
-    // const data = mock
-    // const { temp, feels_like, humidity, pressure } = data.main
-    // const { speed } = data.wind
+    const data = mock
+    const { temp, feels_like, humidity, pressure } = data.main
+    const { speed } = data.wind
 
-    // this.weatherData = {
-    //   city: data.name || '',
-    //   temperature: temp,
-    //   feelsLike: feels_like,
-    //   humidity,
-    //   windSpeed: speed,
-    //   pressure,
-    //   icon: data.weather?.length ? data.weather[0].icon : undefined,
-    // }
-    // console.log('this.weatherData: ', this.weatherData)
-
-    try {
-      this.isLoading = true
-
-      const res = await fetch(
-        `https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?${q}&appid=${process.env.VUE_APP_API_KEY}&units=metric`,
-        {
-          method: 'GET',
-          mode: 'cors',
-          credentials: 'same-origin',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Credentials': 'true',
-            'Access-Control-Allow-Headers': '*',
-            'Content-Type': 'json',
-            'X-Requested-With': 'WebView',
-          },
-          referrerPolicy: 'no-referrer',
-        }
-      )
-      console.log('res: ', res)
-      const data = await res.json()
-      this.weatherData = {
-        city: data.name || '',
-        temperature: data.main.temp,
-        feelsLike: data.main.feels_like,
-        humidity: data.main.humidity,
-        windSpeed: data.wind.speed,
-        pressure: 12,
-        icon: data.weather?.length ? data.weather[0].icon : undefined,
-      }
-    } catch (e) {
-      console.error(e)
-      // if err ---> get current place
-    } finally {
-      this.isLoading = false
+    this.weatherData = {
+      city: data.name || '',
+      temperature: temp,
+      feelsLike: feels_like,
+      humidity,
+      windSpeed: speed,
+      pressure,
+      icon: data.weather?.length ? data.weather[0].icon : undefined,
     }
+    console.log('this.weatherData: ', this.weatherData)
+
+    // try {
+    //   this.isLoading = true
+
+    //   const res = await fetch(
+    //     `https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?${q}&appid=${process.env.VUE_APP_API_KEY}&units=metric`,
+    //     {
+    //       method: 'GET',
+    //       mode: 'cors',
+    //       credentials: 'same-origin',
+    //       headers: {
+    //         'Access-Control-Allow-Origin': '*',
+    //         'Access-Control-Allow-Credentials': 'true',
+    //         'Access-Control-Allow-Headers': '*',
+    //         'Content-Type': 'json',
+    //         'X-Requested-With': 'WebView',
+    //       },
+    //       referrerPolicy: 'no-referrer',
+    //     }
+    //   )
+    //   const data = await res.json()
+    //   console.log(res.status)
+    //   if (res.status !== 200) {
+    //     console.log()
+    //     this.isShowErrModal = true
+    //     this.errMsg = data.message || `Something went wrong.\nMaybe city "${this.location?.city} doesn't exists."`
+    //   } else {
+    //     this.weatherData = {
+    //       city: data.name || '',
+    //       temperature: data.main.temp,
+    //       feelsLike: data.main.feels_like,
+    //       humidity: data.main.humidity,
+    //       windSpeed: data.wind.speed,
+    //       pressure: 12,
+    //       icon: data.weather?.length ? data.weather[0].icon : undefined,
+    //     }
+    //   }
+    // } catch (e) {
+    //   console.error(e)
+    // } finally {
+    //   this.isLoading = false
+    // }
+  }
+  closeErrModal(): void {
+    this.isShowErrModal = false
+    this.errMsg = ''
   }
 
   openConfig(): void {
-    this.isShow = true
+    this.isShowForm = true
   }
   closeForm(option?: 'get-data'): void {
-    this.isShow = false
+    this.isShowForm = false
     if (option === 'get-data') {
       console.log('this.location: ', this.location)
       console.log('todo get data')
