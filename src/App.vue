@@ -5,53 +5,11 @@
         <p class="title" v-if="weatherData">{{ weatherData.city || '' }}</p>
         <el-button type="primary" circle icon="el-icon-s-tools" @click="openConfig"></el-button>
       </div>
-      <div v-if="weatherData" class="weather__wrap">
-        <div class="weather__current">
-          <weather-icon :iconName="weatherData.icon || ''" class="weather__icon" />
-          <div>
-            <span>{{ Math.round(weatherData.temperature, 0) || '' }}</span>
-            <span class="weather__current--sign">°</span>
-          </div>
-        </div>
-        <el-descriptions class="margin-top" :column="1" size="default" border>
-          <el-descriptions-item>
-            <template slot="label">
-              <i class="el-icon-user"></i>
-              Feels like
-            </template>
-            <span class="value">
-              {{ weatherData.feelsLike }}
-            </span>
-          </el-descriptions-item>
-          <el-descriptions-item>
-            <template slot="label">
-              <i class="el-icon-s-unfold"></i>
-              Wind
-            </template>
-            <span class="value">
-              {{ weatherData.windSpeed }}
-            </span>
-          </el-descriptions-item>
-          <el-descriptions-item>
-            <template slot="label">
-              <i class="el-icon-magic-stick"></i>
-              Humidity
-            </template>
-            <span class="value"> {{ weatherData.humidity }} % </span>
-          </el-descriptions-item>
-          <el-descriptions-item>
-            <template slot="label">
-              <i class="el-icon-attract"></i>
-              Pressure
-            </template>
-            <span class="value">
-              {{ weatherData.pressure }}
-            </span>
-          </el-descriptions-item>
-        </el-descriptions>
-      </div>
+      <description :weatherData="weatherData" />
     </el-card>
-    <form-modal :isShow="isShow" :closeConfig="closeConfig"></form-modal>
+    <el-dialog title="Settings" :visible.sync="isShow" width="30%" :before-close="closeForm">
+      <form-modal :isShow="isShow" :closeForm="closeForm"></form-modal>
+    </el-dialog>
   </div>
 </template>
 
@@ -70,43 +28,10 @@
     padding: 5px;
   }
 }
-.value {
-  font-size: 1rem;
-  font-weight: 600;
-}
 .title {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
-}
-.weather {
-  &__icon {
-    margin-right: 20px;
-  }
-  &__current {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    font-size: 6rem;
-    line-height: 6.2rem;
-    font-weight: 700;
-    &--sign {
-      font-size: 4rem;
-    }
-    &--list {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      width: 220px;
-      margin-bottom: 30px;
-      font-size: 20px;
-      line-height: 22px;
-    }
-    &--item {
-      margin-bottom: 5px;
-    }
-  }
 }
 </style>
 
@@ -116,6 +41,7 @@ import { WeatherData, WidgetGeoLocation } from './types'
 import { WEATHER_WIDGET_DATA_HISTORY } from './constantas'
 import FormModal from './components/Form.vue'
 import WeatherIcon from './components/WeatherIcon.vue'
+import Description from './components/Description.vue'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mock = require('./mock.json')
 
@@ -123,6 +49,7 @@ const mock = require('./mock.json')
   components: {
     FormModal,
     WeatherIcon,
+    Description,
   },
 })
 export default class App extends Vue {
@@ -239,8 +166,12 @@ export default class App extends Vue {
   openConfig(): void {
     this.isShow = true
   }
-  closeConfig(): void {
+  closeForm(): void {
     this.isShow = false
+  }
+
+  getNewWeatherData(): void {
+    console.log('getNewWeatherData')
   }
 }
 </script>
