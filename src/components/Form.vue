@@ -96,7 +96,6 @@ export default class Form extends Vue {
 
   mounted(): void {
     this.isConfigFromLocalStorageExists()
-    console.log('form')
   }
 
   isConfigFromLocalStorageExists(): boolean {
@@ -133,10 +132,7 @@ export default class Form extends Vue {
     this.closeForm('get-data')
   }
   deletePlace(index: number): void {
-    console.log(index)
-    console.log('this.history: ', this.history)
     const newHistory = [...this.history.slice(0, index), ...this.history.slice(index + 1)]
-    console.log('this.newHistory: ', newHistory)
     localStorage.setItem(WEATHER_WIDGET_DATA_HISTORY, JSON.stringify(newHistory))
     this.history = newHistory
   }
