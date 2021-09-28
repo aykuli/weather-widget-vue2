@@ -1,6 +1,7 @@
 <template>
-  <div>
-    <draggable :list="history">
+  <div class="container">
+    <p class="history__title">History</p>
+    <draggable :list="history" class="history__list">
       <div v-for="(place, index) in history" :key="index">
         <history-item :deleteItem="() => deletePlace(index)" :place="place"></history-item>
       </div>
@@ -40,7 +41,13 @@
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+.container {
+  & p,
+  span {
+    color: #303133;
+  }
+}
 .label {
   display: flex;
   align-items: flex-start;
@@ -49,6 +56,16 @@
   display: flex;
   justify-content: center;
   padding-top: 20px;
+}
+.history {
+  &__list {
+    margin-bottom: 20px;
+  }
+  &__title {
+    margin-top: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
 }
 </style>
 
