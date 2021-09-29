@@ -1,6 +1,10 @@
 <template>
   <div class="item">
-    <span> {{ place.city }}, {{ place.country }} </span>
+    <div>
+      <i class="el-icon-finished"></i>
+      <span> {{ place.city }}</span>
+      <span v-if="place.country">, {{ place.country }} </span>
+    </div>
     <el-button circle icon="el-icon-delete" type="danger" size="small" @click="() => deleteItem(index)"></el-button>
   </div>
 </template>
@@ -10,8 +14,18 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 5px;
+  transition: background-color ease 500ms;
+  padding: 5px;
+  align-items: center;
+  border-radius: 10px;
+
   & span {
     font-size: 1rem;
+  }
+  &:hover,
+  &:focus {
+    cursor: pointer;
+    background-color: rgba(233, 233, 233, 0.5);
   }
 }
 </style>

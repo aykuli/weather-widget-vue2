@@ -8,7 +8,7 @@
       <description :weatherData="weatherData" />
     </el-card>
     <el-dialog title="Settings" :visible.sync="isShowForm" width="30%" :before-close="closeForm" close-on-press-escape>
-      <form-modal :isShow="isShowForm" :closeForm="closeForm"></form-modal>
+      <form-modal :isShow="isShowForm" :closeForm="closeForm" :locations.sync="locations"></form-modal>
     </el-dialog>
     <el-dialog
       title="Error"
@@ -45,7 +45,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { WeatherData, WidgetGeoLocation } from './types'
-import { ERR_MSG_CITY_WR, WEATHER_WIDGET_DATA_HISTORY, MSG_FETCH_CURR_PLACE, ERR_MSG_CURR_PLACE } from './constantas'
+import { ERR_MSG_CITY_WRONG, WEATHER_WIDGET_DATA_HISTORY, MSG_FETCH_CURR_PLACE, ERR_MSG_CURR_PLACE } from './constantas'
 import FormModal from './components/Form.vue'
 import ErrorModal from './components/ErrorModal.vue'
 import WeatherIcon from './components/WeatherIcon.vue'
@@ -65,6 +65,7 @@ export default class App extends Vue {
   isLoading = false
   weatherData: null | WeatherData = null
   location: WidgetGeoLocation | null = null
+  locations: WidgetGeoLocation[] = []
   isShowForm = false
   isShowErrModal = false
   errMsg = ''
@@ -80,23 +81,30 @@ export default class App extends Vue {
   }
 
   isConfigFromLocalStorageExists(): boolean {
+    const locations = this.checkHistoryFromLS()
+    if (locations) {
+      this.locations = locations as WidgetGeoLocation[]
+      const len = (locations as WidgetGeoLocation[]).length
+      const location = (locations as WidgetGeoLocation[])[len - 1]
+      const { city, latitude, longitude, country }: WidgetGeoLocation = location
+      this.location = { city: city || 'Moscow', latitude, longitude, country }
+      console.log(this.location)
+      return true
+    }
+    return false
+  }
+
+  checkHistoryFromLS(): boolean | WidgetGeoLocation[] {
     const locationsStr = localStorage.getItem(WEATHER_WIDGET_DATA_HISTORY)
     if (locationsStr) {
-      try {
-        const locations = JSON.parse(locationsStr)
-        const location = locations[locations.length - 1]
-        const { city, latitude, longitude, country }: WidgetGeoLocation = location
-        this.location = {
-          city: city || 'Moscow',
-          latitude,
-          longitude,
-          country,
-        }
-        console.log(this.location)
-        return true
-      } catch (e) {
+      const locations = JSON.parse(locationsStr)
+      const isValid = typeof locations === 'object' && locations.length
+      if (!isValid) {
+        localStorage.removeItem(WEATHER_WIDGET_DATA_HISTORY)
+        this.locations = []
         return false
       }
+      return locations
     }
     return false
   }
@@ -130,7 +138,7 @@ export default class App extends Vue {
     }
   }
 
-  private async fetchWeatherData(q: string) {
+  private async fetchWeatherData(q: string, option?: { isFromForm: boolean; newLocation: WidgetGeoLocation }) {
     // const data = mock
     // const { temp, feels_like, humidity, pressure } = data.main
     // const { speed } = data.wind
@@ -148,7 +156,6 @@ export default class App extends Vue {
 
     try {
       this.isLoading = true
-
       const res = await fetch(
         `https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?${q}&appid=${process.env.VUE_APP_API_KEY}&units=metric`,
         {
@@ -179,6 +186,9 @@ export default class App extends Vue {
           pressure: 12,
           icon: data.weather?.length ? data.weather[0].icon : undefined,
         }
+        if (option && option.isFromForm) {
+          this.addCityToLS(option.newLocation)
+        }
       }
     } catch (e) {
       console.error(e)
@@ -188,20 +198,16 @@ export default class App extends Vue {
   }
 
   handleError(msg?: string): void {
-    console.log('handleError')
-    console.log('msg: ', msg)
     this.isShowErrModal = true
     setTimeout(() => {
       this.closeErrModal()
     }, 3000)
-    if (msg === ERR_MSG_CITY_WR) {
+    if (msg === ERR_MSG_CITY_WRONG) {
       this.errMsg = `${msg}.\n${MSG_FETCH_CURR_PLACE}`
-      console.log('this.errMsg: ', this.errMsg)
+      this.deleteLastRowFromHistory()
       this.getCurrentPlace()
-
       return
     }
-    // this.isShowErrModal = true
     this.errMsg = msg || `Something went wrong.\nMaybe city "${this.location?.city} doesn't exists."`
   }
 
@@ -213,21 +219,26 @@ export default class App extends Vue {
   openConfig(): void {
     this.isShowForm = true
   }
-  closeForm(option?: 'get-data'): void {
+  closeForm(newLocation?: WidgetGeoLocation): void {
     this.isShowForm = false
-    if (option === 'get-data') {
-      console.log('this.location: ', this.location)
-      console.log('todo get data')
-      const locations = JSON.parse(localStorage.getItem(WEATHER_WIDGET_DATA_HISTORY) || '')
-      const location = locations[locations.length - 1]
-      const { city, country } = location
-      console.log('location: ', location)
-      this.fetchWeatherData(`q=${city}${country ? `,${country}` : ''}`)
+    if (newLocation) {
+      console.log('newLocation: ', newLocation)
+      const { city, country } = newLocation
+      this.fetchWeatherData(`q=${city}${country ? `,${country}` : ''}`, { isFromForm: true, newLocation })
     }
   }
 
-  getNewWeatherData(): void {
-    console.log('getNewWeatherData')
+  deleteLastRowFromHistory(): void {
+    const locations = this.checkHistoryFromLS()
+    if (locations) {
+      this.locations = (locations as WidgetGeoLocation[]).slice(0, -1)
+      localStorage.setItem(WEATHER_WIDGET_DATA_HISTORY, JSON.stringify(this.locations))
+    }
+  }
+
+  addCityToLS(newLocation: WidgetGeoLocation): void {
+    this.locations = [...this.locations, newLocation]
+    localStorage.setItem(WEATHER_WIDGET_DATA_HISTORY, JSON.stringify(this.locations))
   }
 }
 </script>

@@ -58,7 +58,9 @@
     line-height: 6.2rem;
     font-weight: 700;
     &--sign {
-      font-size: 4rem;
+      font-size: 5rem;
+      line-height: 6.2rem;
+      vertical-align: text-top;
     }
   }
 }

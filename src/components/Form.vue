@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <p class="history__title">History</p>
-    <draggable :list="history" class="history__list">
-      <div v-for="(place, index) in history" :key="index">
+    <draggable :list="locations" class="history__list">
+      <div v-for="(place, index) in locations" :key="index">
         <history-item :deleteItem="() => deletePlace(index)" :place="place"></history-item>
       </div>
     </draggable>
@@ -83,33 +83,35 @@ import { WidgetGeoLocation } from '@/types'
   },
   props: {
     isShow: Boolean,
+    locations: Object,
     closeForm: Function,
   },
 })
 export default class Form extends Vue {
   isShow!: string
-  closeForm!: (option?: 'get-data') => void
+  closeForm!: (newLocation?: WidgetGeoLocation) => void
+  locations!: WidgetGeoLocation[]
 
-  history: WidgetGeoLocation[] = []
+  // history: WidgetGeoLocation[] = []
   city = ''
   country = ''
 
-  mounted(): void {
-    this.isConfigFromLocalStorageExists()
-  }
+  // mounted(): void {
+  //   this.isConfigFromLocalStorageExists()
+  // }
 
-  isConfigFromLocalStorageExists(): boolean {
-    const history = localStorage.getItem(WEATHER_WIDGET_DATA_HISTORY)
-    if (history) {
-      try {
-        this.history = JSON.parse(history)
-        return true
-      } catch (e) {
-        return false
-      }
-    }
-    return false
-  }
+  // isConfigFromLocalStorageExists(): boolean {
+  //   const history = localStorage.getItem(WEATHER_WIDGET_DATA_HISTORY)
+  //   if (history) {
+  //     try {
+  //       this.history = JSON.parse(history)
+  //       return true
+  //     } catch (e) {
+  //       return false
+  //     }
+  //   }
+  //   return false
+  // }
 
   inputHandler(type: 'city' | 'country', value: string): void {
     switch (type) {
@@ -125,16 +127,15 @@ export default class Form extends Vue {
   }
 
   saveLocation(): void {
-    this.history = [...this.history, { city: this.city, country: this.country } as WidgetGeoLocation]
-    localStorage.setItem(WEATHER_WIDGET_DATA_HISTORY, JSON.stringify(this.history))
+    const locationToSave = this.city ? { city: this.city, country: this.country } : undefined
+    this.closeForm(locationToSave)
     this.city = ''
     this.country = ''
-    this.closeForm('get-data')
   }
   deletePlace(index: number): void {
-    const newHistory = [...this.history.slice(0, index), ...this.history.slice(index + 1)]
+    const newHistory = [...this.locations.slice(0, index), ...this.locations.slice(index + 1)]
     localStorage.setItem(WEATHER_WIDGET_DATA_HISTORY, JSON.stringify(newHistory))
-    this.history = newHistory
+    this.locations = newHistory
   }
 }
 </script>
