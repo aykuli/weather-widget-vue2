@@ -13,9 +13,7 @@
           <i class="el-icon-user"></i>
           Feels like
         </template>
-        <span class="value">
-          {{ weatherData.feelsLike }}
-        </span>
+        <span class="value"> {{ Math.round(weatherData.feelsLike, 0) || '' }}° </span>
       </el-descriptions-item>
       <el-descriptions-item>
         <template slot="label">

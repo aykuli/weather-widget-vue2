@@ -10,8 +10,8 @@ export interface WeatherData {
 
 export interface WidgetGeoLocation {
   city?: string
-  stateCode?: string
-  countryCode?: string
+  state?: string
+  country?: string
   latitude?: number
   longitude?: number
 }
