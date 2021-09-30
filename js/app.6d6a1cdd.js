@@ -1,4 +1,5 @@
 (function (t) {
+  console.log('0')
   function e(e) {
     for (var r, i, c = e[0], s = e[1], l = e[2], d = 0, h = []; d < c.length; d++)
       (i = c[d]), Object.prototype.hasOwnProperty.call(a, i) && a[i] && h.push(a[i][0]), (a[i] = 0);
@@ -822,7 +823,7 @@
                                   (this.isLoading = !0),
                                   (t.next = 4),
                                   fetch(
-                                    'http://api.openweathermap.org/data/2.5/weather?'
+                                    'https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?'
                                       .concat(e, '&appid=641f6065a678dd5a0d804a9e7a8d6d58')
                                       .concat('&units=metric'),
                                     {
