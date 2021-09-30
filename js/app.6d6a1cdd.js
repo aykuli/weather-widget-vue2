@@ -822,7 +822,7 @@
                                   (this.isLoading = !0),
                                   (t.next = 4),
                                   fetch(
-                                    'https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?'
+                                    'http://api.openweathermap.org/data/2.5/weather?'
                                       .concat(e, '&appid=641f6065a678dd5a0d804a9e7a8d6d58')
                                       .concat('&units=metric'),
                                     {
