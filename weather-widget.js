@@ -6,14 +6,14 @@ class WeatherWidget extends HTMLElement {
     });
 
     const f2 = document.createElement('script')
-    f2.src="./js/styles.js"
+    f2.src="https://aykuli.github.io/weather-widget-vue2/js/styles.js"
     shadow.appendChild(f2);
     const f = document.createElement('script')
-    f.src="./js/app.6d6a1cdd.js"
+    f.src="https://aykuli.github.io/weather-widget-vue2/js/app.js"
     shadow.appendChild(f);
 
     const f1 = document.createElement('script')
-    f1.src="./js/chunk-vendors.3ef5530b.js"
+    f1.src="https://aykuli.github.io/weather-widget-vue2/js/chunk-vendors.js"
     shadow.appendChild(f1);
 }
 }
