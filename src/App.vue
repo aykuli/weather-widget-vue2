@@ -1,9 +1,23 @@
 <template>
-  <div class="container">
+  <div class="containerApp">
     <el-card shadow="always" class="box-card">
       <div slot="header" class="clearfix header">
         <p class="title" v-if="weatherData">{{ weatherData.city || '' }}</p>
-        <el-button type="primary" circle icon="el-icon-s-tools" @click="openConfig"></el-button>
+        <el-button type="primary" circle @click="openConfig">
+          <svg
+            width="20"
+            height="20"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            viewBox="0 0 24 24"
+          >
+            <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="1"></circle>
+              <circle cx="12" cy="19" r="1"></circle>
+              <circle cx="12" cy="5" r="1"></circle>
+            </g>
+          </svg>
+        </el-button>
       </div>
       <description :weatherData="weatherData" />
     </el-card>
@@ -23,9 +37,8 @@
 </template>
 
 <style scoped lang="scss">
-.container {
-  min-width: 100px;
-  max-width: 500px;
+.containerApp {
+  max-width: 350px;
 }
 .header {
   display: flex;
@@ -50,8 +63,6 @@ import FormModal from './components/Form.vue'
 import ErrorModal from './components/ErrorModal.vue'
 import WeatherIcon from './components/WeatherIcon.vue'
 import Description from './components/Description.vue'
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const mock = require('./mock.json')
 
 @Component({
   components: {

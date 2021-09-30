@@ -35,7 +35,7 @@
       </el-descriptions>
       <div class="footer">
         <el-button @click="closeForm">Cancel</el-button>
-        <el-button type="primary" @click="saveLocation" icon="el-icon-sunrise">Submit</el-button>
+        <el-button type="primary" @click="saveLocation">Submit</el-button>
       </div>
     </form>
   </div>
