@@ -1,5 +1,4 @@
 (function (t) {
-  console.log('0')
   function e(e) {
     for (var r, i, c = e[0], s = e[1], l = e[2], d = 0, h = []; d < c.length; d++)
       (i = c[d]), Object.prototype.hasOwnProperty.call(a, i) && a[i] && h.push(a[i][0]), (a[i] = 0);
