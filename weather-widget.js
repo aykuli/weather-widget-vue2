@@ -1,4 +1,4 @@
-class WeatherWidget extends HTMLDivElement {
+class WeatherWidget extends HTMLElement {
   render() {
     this.innerHTML = `
     <iframe id="weather-widget"
